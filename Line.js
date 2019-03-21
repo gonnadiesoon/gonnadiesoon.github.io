@@ -9,7 +9,7 @@ class Line {
         this.maxY = maxY;
         this.state = state;
         this.transparency = 1;
-
+        this.updateStep = undefined;
         this.color = color.replace(/\d\.\d*\)$/, `${this.transparency})`);
     }
 
@@ -36,16 +36,8 @@ class Line {
     }
 
     setTransparency = alpha => {
-        this.color = this.color.replace(/\d\.\d*\)$/, `${alpha})`);
         this.transparency = alpha;
-    }
-
-    disappear = () => {
-
-    }
-
-    appear = () => {
-
+        this.color = this.color.replace(/\d\.?\d*\)$/, `${this.transparency})`);
     }
 }
 

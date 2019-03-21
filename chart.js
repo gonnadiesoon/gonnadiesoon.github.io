@@ -44,6 +44,7 @@ xhr.onreadystatechange = function () {
         THUMBNAIL_BACKGROUND_COLOR = "rgba(245, 249, 251, 0.75)",
             THUMBNAIL_BORDER_COLOR = "rgba(222, 235, 243, 0.85)",
             THUMBNAIL_VERTICAL_PADDING = 5 / window.devicePixelRatio,
+            THUMBNAIL_LINES_TRANSPARENCY_STEP = 1 / 8,
             FRAME_RATIO = 0.267661692,
             FRAME_VERTICAL_BORDER_WIDTH = 4,
             FRAME_HORIZONAL_BORDER_WIDTH = FRAME_VERTICAL_BORDER_WIDTH / 4;
@@ -297,16 +298,7 @@ xhr.onreadystatechange = function () {
                 }
             });
 
-            //CHECKBUTTONS
-            for (let i = 0; i < checkbuttons.length; i++) {
-                checkbuttons[i].addEventListener("change", event => {
-                    let lineLabel = event.target.getAttribute("data-line-label");
-                    canvasState.checkedLines[lineLabel] = event.target.checked;
-                    canvasState.updateMAX_Y();
-                })
-            }
 
-            
             let thumbnailLines = {};
             for (let i = 0; i < lines.y.length; i++) {
                 thumbnailLines[lines.y[i][0]] = new Line(
@@ -320,9 +312,53 @@ xhr.onreadystatechange = function () {
                 );
             }
 
+            //CHECKBUTTONS
+            for (let i = 0; i < checkbuttons.length; i++) {
+                checkbuttons[i].addEventListener("change", event => {
+                    let lineLabel = event.target.getAttribute("data-line-label");
+                    canvasState.checkedLines[lineLabel] = event.target.checked;
+                    thumbnailLines[lineLabel].state = canvasState.checkedLines[lineLabel] ? "appearing" : "disappearing";
+                    canvasState.updateMAX_Y();
+                    console.log(thumbnailLines, canvasState.MAX_Y)
+
+                })
+            }
+
             function drawChart() {
                 for (const label in thumbnailLines) {
-                    if (thumbnailLines.hasOwnProperty(label) && thumbnailLines[label].state) {
+                    if (thumbnailLines.hasOwnProperty(label)) {
+                        if (thumbnailLines[label].state === "shown") {
+                            if (thumbnailLines[label].maxY !== canvasState.MAX_Y) {
+                                thumbnailLines[label].updateStep = thumbnailLines[label].updateStep === undefined || ((canvasState.MAX_Y - thumbnailLines[label].maxY) / thumbnailLines[label].updateStep) < 0 ?
+                                    Math.trunc((canvasState.MAX_Y - thumbnailLines[label].maxY) / 7) : thumbnailLines[label].updateStep;
+
+                                if (Math.abs(canvasState.MAX_Y - thumbnailLines[label].maxY) < Math.abs(thumbnailLines[label].updateStep)) {
+                                    thumbnailLines[label].maxY = canvasState.MAX_Y;
+                                    thumbnailLines[label].updateStep = undefined;
+                                    console.log(thumbnailLines[label].maxY, canvasState.MAX_Y, thumbnailLines[label].updateStep)
+
+                                } else {
+                                    thumbnailLines[label].maxY += thumbnailLines[label].updateStep;
+                                    console.log(thumbnailLines[label].maxY, canvasState.MAX_Y, thumbnailLines[label].updateStep)
+                                }
+                            }
+                        } 
+                        else if (thumbnailLines[label].state === "appearing") {
+                            thumbnailLines[label].maxY = canvasState.MAX_Y;
+                            if (thumbnailLines[label].transparency < 1) {
+                                thumbnailLines[label].setTransparency(thumbnailLines[label].transparency + THUMBNAIL_LINES_TRANSPARENCY_STEP);
+                            } else {
+                                thumbnailLines[label].state = "shown";
+                            }
+                        }
+                        else if (thumbnailLines[label].state === "disappearing") {
+                            if (thumbnailLines[label].transparency > 0) {
+                                thumbnailLines[label].setTransparency(thumbnailLines[label].transparency - THUMBNAIL_LINES_TRANSPARENCY_STEP);
+                            } else {
+                                thumbnailLines[label].state = "hidden";
+                            }
+                        }
+
                         thumbnailLines[label].draw(canvasWidth, canvasHeight);
                     }
                 }
@@ -345,4 +381,3 @@ xhr.onreadystatechange = function () {
         });
     }
 }
-
