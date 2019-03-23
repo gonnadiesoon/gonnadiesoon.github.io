@@ -26,8 +26,9 @@ class Line {
 
         let getCanvasCoordinates = (x, y) => {
             let test_max = y > this.maxY ? y : this.maxY;
-            return [((x - MIN_X) / (MAX_X - MIN_X)) * canvasWidth, Math.abs((y / this.maxY - 1) * (canvasHeight - THUMBNAIL_VERTICAL_PADDING * 2)) + THUMBNAIL_VERTICAL_PADDING];
+            return [((x - MIN_X) / (MAX_X - MIN_X)) * canvasWidth, (1 - y / this.maxY) * (canvasHeight - THUMBNAIL_VERTICAL_PADDING * 2) + THUMBNAIL_VERTICAL_PADDING];
             //canvasHeight - 4 —— отрезок Y теперь [0, canvasHeight - 4], затем + 2 —— опускаем график на 2 пикселя, создавая padding
+            //
         };
         
         this.c.moveTo(...getCanvasCoordinates(this.xs, this.ys));

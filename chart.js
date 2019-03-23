@@ -261,7 +261,7 @@ xhr.onreadystatechange = function () {
                         index_of_x2 = approximate_x2 >= lines.x[i] ? i : index_of_x2;
                     }
                     //}
-                    console.log(index_of_x1, index_of_x2)
+                    //console.log(index_of_x1, index_of_x2)
 
                     this.index_of_x1 = index_of_x1;
                     this.index_of_x2 = index_of_x2;
@@ -277,10 +277,10 @@ xhr.onreadystatechange = function () {
                                     lines.x[index_of_x1],
                                     chartLines[label].y[index_of_x1]
                                 ];
-                            //    console.log("x1:", x1, "y1:", y1, "x2:", x2, "y2:", y2, 'xs:', this.xs);
+                                //    console.log("x1:", x1, "y1:", y1, "x2:", x2, "y2:", y2, 'xs:', this.xs);
 
                                 chartLines[label].ys = y1 === y2 ? y2 : ((x1 * y2 - x2 * y1) + (y1 - y2) * this.xs) / (x1 - x2);
-                               // console.log("Y_START:", chartLines[label].ys, "Y1:", chartLines[label].y[index_of_x1]);
+                                // console.log("Y_START:", chartLines[label].ys, "Y1:", chartLines[label].y[index_of_x1]);
                             }
                         }
                     } else {
@@ -304,7 +304,7 @@ xhr.onreadystatechange = function () {
                                     lines.x[index_of_x2 + 1],
                                     chartLines[label].y[index_of_x2 + 1]
                                 ];
-                               // console.log("x1:", x1, "y1:", y1, "x2:", x2, "y2:", y2, 'xe:', this.xe);
+                                // console.log("x1:", x1, "y1:", y1, "x2:", x2, "y2:", y2, 'xe:', this.xe);
                                 chartLines[label].ye = y1 === y2 ? y2 : ((x1 * y2 - x2 * y1) + (y1 - y2) * this.xe) / (x1 - x2);
                                 //console.log("Y_END:", chartLines[label].ye, "Y2:", chartLines[label].y[index_of_x2]);
                             }
@@ -346,13 +346,13 @@ xhr.onreadystatechange = function () {
                             if (chartLines[label].ye > temporary_MaxY) {
                                 temporary_MaxY = chartLines[label].ye;
                             }
-                            console.log("label:", label, temporary_MaxY);
+                            //console.log("label:", label, temporary_MaxY);
 
 
                             return temporary_MaxY;
                         }, 0);
 
-                    console.log("MAX_Y:", this.MAX_Y);
+                    //console.log("MAX_Y:", this.MAX_Y);
                     if (initLines) {
                         for (const label in chartLines) {
                             if (chartLines.hasOwnProperty(label)) {
@@ -566,34 +566,24 @@ xhr.onreadystatechange = function () {
                     if (chartLines[label].maxY !== chartState.MAX_Y) {
 
                         if (chartState.MAX_Y !== chartOldMaxY) {
-                            if (chartOldMaxY < chartState.MAX_Y) {
-                                chartOldMaxY = chartState.MAX_Y;
-
-                                for (const label in chartLines) {
-                                    if (chartLines.hasOwnProperty(label)) {
-                                        chartLines[label].maxY = chartOldMaxY;
-                                    }
-                                }
-                            } else {
-                                chartOldMaxY = chartState.MAX_Y;
-                                for (const label in chartLines) {
-                                    if (chartLines.hasOwnProperty(label)) {
-                                        chartLines[label].updateStep = (chartOldMaxY - chartLines[label].maxY) / 6;
-                                    }
+                            chartOldMaxY = chartState.MAX_Y;
+                            for (const label in chartLines) {
+                                if (chartLines.hasOwnProperty(label)) {
+                                    chartLines[label].updateStep = (chartOldMaxY - chartLines[label].maxY) / 5;
                                 }
                             }
                         }
 
                         chartLines[label].updateStep = chartLines[label].updateStep === undefined || ((chartOldMaxY - chartLines[label].maxY) / chartLines[label].updateStep) < 0 ?
-                            (chartOldMaxY - chartLines[label].maxY) / 6 : chartLines[label].updateStep;
+                            (chartOldMaxY - chartLines[label].maxY) / 5 : chartLines[label].updateStep;
 
                         if (Math.abs(chartOldMaxY - chartLines[label].maxY) < Math.abs(chartLines[label].updateStep) || Math.abs(chartLines[label].updateStep) === 0) {
                             chartLines[label].maxY = chartOldMaxY;
                             chartLines[label].updateStep = undefined;
-                            console.log(chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                            //console.log(chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
                         } else {
                             chartLines[label].maxY += chartLines[label].updateStep;
-                            console.log("UPDATING:", chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                            //consogitle.log("UPDATING:", chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
                         }
                     }
 
