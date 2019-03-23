@@ -62,7 +62,6 @@ class Line {
         this.transparency = alpha;
         this.color = this.color.replace(/\d\.?\d*\)$/, `${this.transparency})`);
     }
-
 }
 
 // possible states: 

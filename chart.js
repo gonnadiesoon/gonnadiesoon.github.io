@@ -523,15 +523,16 @@ xhr.onreadystatechange = function () {
                     thumbnailLines[lineLabel].state = thumbnailState.checkedLines[lineLabel] ? "appearing" : "disappearing";
                     thumbnailState.updateMAX_Y();
                     chartLines[lineLabel].state = thumbnailState.checkedLines[lineLabel] ? "appearing" : "disappearing";
+                    let oldMAX_Y = chartState.MAX_Y;
                     chartState.updateMAX_Y();
+                    chartLines[lineLabel].dMx = 0.05 * (chartState.MAX_Y === 0 ? oldMAX_Y : chartState.MAX_Y);
 
                     //console.log(thumbnailLines, thumbnailState.MAX_Y)
 
                 })
             }
 
-
-            let [initialThumbnailMaxY, chartOldMaxY] = [thumbnail.MAX_Y, chartState.MAX_Y];
+            let chartOldMaxY = chartState.MAX_Y;
 
             function drawThumbnail() {
                 lineLabels.map(label => {
@@ -588,27 +589,28 @@ xhr.onreadystatechange = function () {
                                 //consogitle.log("UPDATING:", chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
                             }
                         }
-                    }
-
-                    else if (chartLines[label].state === "appearing") {
+                    } else if (chartLines[label].state === "hidden" && chartState.MAX_Y !== 0) {
+                        chartLines[label].dMx = 0.05 * chartState.MAX_Y;
+                        chartLines[label].maxY = chartState.MAX_Y - 10 * chartLines[label].dMx;
+                    } else if (chartLines[label].state === "appearing") {
                         if (chartLines[label].transparency < 1) {
                             chartLines[label].setTransparency((chartLines[label].transparency * 10 + CHART_LINES_TRANSPARENCY_STEP * 10) / 10);
                             chartLines[label].stepsCount = chartLines[label].transparency / CHART_LINES_TRANSPARENCY_STEP;
-                            chartLines[label].dMx = chartLines[label].maxY * 0.05;
+                            //chartLines[label].dMx = chartLines[label].maxY * 0.05;
                             chartLines[label].maxY += chartLines[label].dMx;
                         } else {
                             //chartLines[label].maxY = chartState.MAX_Y;
                             //chartLines[label].dMx = undefined;
                             chartLines[label].state = "shown";
                         }
-                    }
-
-                    else if (chartLines[label].state === "disappearing") {
+                    } else if (chartLines[label].state === "disappearing") {
                         if (chartLines[label].transparency > 0) {
                             chartLines[label].setTransparency((chartLines[label].transparency * 10 - CHART_LINES_TRANSPARENCY_STEP * 10) / 10);
                             chartLines[label].stepsCount = chartLines[label].transparency / CHART_LINES_TRANSPARENCY_STEP;
-                            chartLines[label].dMx = chartLines[label].maxY * 0.05;
+                            //chartLines[label].dMx = chartLines[label].maxY * 0.05;
+                            console.log(chartLines[label].maxY, chartLines[label].dMx);
                             chartLines[label].maxY -= chartLines[label].dMx;
+                            console.log(chartLines[label].maxY, chartLines[label].dMx);
                         } else {
                             chartLines[label].state = "hidden";
                         }
