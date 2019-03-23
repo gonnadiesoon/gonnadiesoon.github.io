@@ -20,6 +20,7 @@ h2 {
 /* CHECKBUTTON */
 .checkbutton {
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
     display: inline-flex;
     align-items: center;
     position: relative;

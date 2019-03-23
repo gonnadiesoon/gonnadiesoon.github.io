@@ -36,9 +36,9 @@ class Frame {
     }
 
     scale = (dx, scalingBorder) => {
-        console.log("BEFORE:", this.x1)
+        //console.log("BEFORE:", this.x1)
         if (scalingBorder === "left") {
-            console.log(this.x1 + dx, this.x2, this.minWidth)
+        //    console.log(this.x1 + dx, this.x2, this.minWidth)
             this.x1 += this.x2 - (this.x1 + dx) < this.minWidth ?
                 dx - (this.minWidth - (this.x2 - (this.x1 + dx))) :
                 dx;
@@ -47,7 +47,7 @@ class Frame {
                 dx + this.minWidth - ((this.x2 + dx) - this.x1) :
                 dx;
         }
-        console.log("AFTER:", this.x1)
+        //console.log("AFTER:", this.x1)
 
         // если выехал за границу
         this.x1 = this.x1 < this.minX ? this.minX : this.x1;
