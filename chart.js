@@ -44,7 +44,8 @@ xhr.onreadystatechange = function () {
         THUMBNAIL_BACKGROUND_COLOR = "rgba(245, 249, 251, 0.75)",
             THUMBNAIL_BORDER_COLOR = "rgba(222, 235, 243, 0.85)",
             THUMBNAIL_VERTICAL_PADDING = 5 / window.devicePixelRatio,
-            THUMBNAIL_LINES_TRANSPARENCY_STEP = 1 / 8,
+            THUMBNAIL_LINES_TRANSPARENCY_STEP = 1 / 10,
+            CHART_LINES_TRANSPARENCY_STEP = 1 / 10,
             FRAME_RATIO = 0.267661692,
             FRAME_VERTICAL_BORDER_WIDTH = 4,
             FRAME_HORIZONAL_BORDER_WIDTH = FRAME_VERTICAL_BORDER_WIDTH / 4,
@@ -521,6 +522,9 @@ xhr.onreadystatechange = function () {
                     thumbnailState.checkedLines[lineLabel] = event.target.checked;
                     thumbnailLines[lineLabel].state = thumbnailState.checkedLines[lineLabel] ? "appearing" : "disappearing";
                     thumbnailState.updateMAX_Y();
+                    chartLines[lineLabel].state = thumbnailState.checkedLines[lineLabel] ? "appearing" : "disappearing";
+                    chartState.updateMAX_Y();
+
                     //console.log(thumbnailLines, thumbnailState.MAX_Y)
 
                 })
@@ -534,7 +538,7 @@ xhr.onreadystatechange = function () {
                     if (thumbnailLines[label].state === "shown") {
                         if (thumbnailLines[label].maxY !== thumbnailState.MAX_Y) {
                             thumbnailLines[label].updateStep = thumbnailLines[label].updateStep === undefined || ((thumbnailState.MAX_Y - thumbnailLines[label].maxY) / thumbnailLines[label].updateStep) < 0 ? //второе условие - если пошли в другую сторону
-                                Math.trunc((thumbnailState.MAX_Y - thumbnailLines[label].maxY) / 7) : thumbnailLines[label].updateStep;
+                                Math.trunc((thumbnailState.MAX_Y - thumbnailLines[label].maxY) / 10) : thumbnailLines[label].updateStep;
 
                             if (Math.abs(thumbnailState.MAX_Y - thumbnailLines[label].maxY) < Math.abs(thumbnailLines[label].updateStep)) {
                                 thumbnailLines[label].maxY = thumbnailState.MAX_Y;
@@ -549,41 +553,64 @@ xhr.onreadystatechange = function () {
                     } else if (thumbnailLines[label].state === "appearing") {
                         thumbnailLines[label].maxY = thumbnailState.MAX_Y;
                         if (thumbnailLines[label].transparency < 1) {
-                            thumbnailLines[label].setTransparency(thumbnailLines[label].transparency + THUMBNAIL_LINES_TRANSPARENCY_STEP);
+                            thumbnailLines[label].setTransparency((thumbnailLines[label].transparency * 10 + THUMBNAIL_LINES_TRANSPARENCY_STEP * 10) / 10);
                         } else {
                             thumbnailLines[label].state = "shown";
                         }
                     } else if (thumbnailLines[label].state === "disappearing") {
                         if (thumbnailLines[label].transparency > 0) {
-                            thumbnailLines[label].setTransparency(thumbnailLines[label].transparency - THUMBNAIL_LINES_TRANSPARENCY_STEP);
+                            thumbnailLines[label].setTransparency((thumbnailLines[label].transparency * 10 - THUMBNAIL_LINES_TRANSPARENCY_STEP * 10) / 10);
                         } else {
                             thumbnailLines[label].state = "hidden";
                         }
                     }
 
-
-
-                    if (chartLines[label].maxY !== chartState.MAX_Y) {
-
-                        if (chartState.MAX_Y !== chartOldMaxY) {
-                            chartOldMaxY = chartState.MAX_Y;
-                            for (const label in chartLines) {
-                                if (chartLines.hasOwnProperty(label)) {
-                                    chartLines[label].updateStep = (chartOldMaxY - chartLines[label].maxY) / 5;
+                    if (chartLines[label].state === "shown") {
+                        if (chartLines[label].maxY !== chartState.MAX_Y) {
+                            if (chartState.MAX_Y !== chartOldMaxY) {
+                                chartOldMaxY = chartState.MAX_Y;
+                                for (const label in chartLines) {
+                                    if (chartLines.hasOwnProperty(label)) {
+                                        chartLines[label].updateStep = (chartOldMaxY - chartLines[label].maxY) / 10;
+                                    }
                                 }
                             }
+
+                            chartLines[label].updateStep = chartLines[label].updateStep === undefined || ((chartOldMaxY - chartLines[label].maxY) / chartLines[label].updateStep) < 0 ?
+                                (chartOldMaxY - chartLines[label].maxY) / 10 : chartLines[label].updateStep;
+
+                            if (Math.abs(chartOldMaxY - chartLines[label].maxY) < Math.abs(chartLines[label].updateStep) || Math.abs(chartLines[label].updateStep) === 0) {
+                                chartLines[label].maxY = chartOldMaxY;
+                                chartLines[label].updateStep = undefined;
+                                //console.log(chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                            } else {
+                                chartLines[label].maxY += chartLines[label].updateStep;
+                                //consogitle.log("UPDATING:", chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                            }
                         }
+                    }
 
-                        chartLines[label].updateStep = chartLines[label].updateStep === undefined || ((chartOldMaxY - chartLines[label].maxY) / chartLines[label].updateStep) < 0 ?
-                            (chartOldMaxY - chartLines[label].maxY) / 5 : chartLines[label].updateStep;
-
-                        if (Math.abs(chartOldMaxY - chartLines[label].maxY) < Math.abs(chartLines[label].updateStep) || Math.abs(chartLines[label].updateStep) === 0) {
-                            chartLines[label].maxY = chartOldMaxY;
-                            chartLines[label].updateStep = undefined;
-                            //console.log(chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                    else if (chartLines[label].state === "appearing") {
+                        if (chartLines[label].transparency < 1) {
+                            chartLines[label].setTransparency((chartLines[label].transparency * 10 + CHART_LINES_TRANSPARENCY_STEP * 10) / 10);
+                            chartLines[label].stepsCount = chartLines[label].transparency / CHART_LINES_TRANSPARENCY_STEP;
+                            chartLines[label].dMx = chartLines[label].maxY * 0.05;
+                            chartLines[label].maxY += chartLines[label].dMx;
                         } else {
-                            chartLines[label].maxY += chartLines[label].updateStep;
-                            //consogitle.log("UPDATING:", chartLines[label].maxY, chartOldMaxY, chartLines[label].updateStep)
+                            //chartLines[label].maxY = chartState.MAX_Y;
+                            //chartLines[label].dMx = undefined;
+                            chartLines[label].state = "shown";
+                        }
+                    }
+
+                    else if (chartLines[label].state === "disappearing") {
+                        if (chartLines[label].transparency > 0) {
+                            chartLines[label].setTransparency((chartLines[label].transparency * 10 - CHART_LINES_TRANSPARENCY_STEP * 10) / 10);
+                            chartLines[label].stepsCount = chartLines[label].transparency / CHART_LINES_TRANSPARENCY_STEP;
+                            chartLines[label].dMx = chartLines[label].maxY * 0.05;
+                            chartLines[label].maxY -= chartLines[label].dMx;
+                        } else {
+                            chartLines[label].state = "hidden";
                         }
                     }
 
