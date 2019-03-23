@@ -526,6 +526,9 @@ xhr.onreadystatechange = function () {
                     let oldMAX_Y = chartState.MAX_Y;
                     chartState.updateMAX_Y();
                     chartLines[lineLabel].dMx = 0.05 * (chartState.MAX_Y === 0 ? oldMAX_Y : chartState.MAX_Y);
+                    if (thumbnailState.checkedLines[lineLabel]) {
+                        chartLines[lineLabel].maxY = (chartState.MAX_Y === 0 ? oldMAX_Y : chartState.MAX_Y) - 10 * chartLines[lineLabel].dMx;
+                    }
 
                     //console.log(thumbnailLines, thumbnailState.MAX_Y)
 
@@ -602,6 +605,7 @@ xhr.onreadystatechange = function () {
                             //chartLines[label].maxY = chartState.MAX_Y;
                             //chartLines[label].dMx = undefined;
                             chartLines[label].state = "shown";
+                            //chartLines[label].maxY = chartState.MAX_Y;
                         }
                     } else if (chartLines[label].state === "disappearing") {
                         if (chartLines[label].transparency > 0) {

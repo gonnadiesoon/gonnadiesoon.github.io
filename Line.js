@@ -27,7 +27,7 @@ class Line {
 
         let getCanvasCoordinates = (x, y, index) => {
             if (index) {
-                return [((x - MIN_X) / (MAX_X - MIN_X)) * canvasWidth, (1 - y / ((this.state === "disappearing" ? 1 / (1 + 0.003*this.stepsCount) : 1 + 0.003*(10-this.stepsCount)) * this.maxY)) * (canvasHeight - THUMBNAIL_VERTICAL_PADDING * 2) + THUMBNAIL_VERTICAL_PADDING];
+                return [((x - MIN_X) / (MAX_X - MIN_X)) * canvasWidth, (1 - y / ((this.state === "disappearing" ? 1 / (1 + 0.009*this.stepsCount) : 1 + 0.009*(10-this.stepsCount)) * this.maxY)) * (canvasHeight - THUMBNAIL_VERTICAL_PADDING * 2) + THUMBNAIL_VERTICAL_PADDING];
             }
 
             return [((x - MIN_X) / (MAX_X - MIN_X)) * canvasWidth, (1 - y / this.maxY) * (canvasHeight - THUMBNAIL_VERTICAL_PADDING * 2) + THUMBNAIL_VERTICAL_PADDING];
